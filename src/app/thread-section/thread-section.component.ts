@@ -12,12 +12,21 @@ import {LoadUserThreadsAction} from '../store/actions';
 })
 export class ThreadSectionComponent implements OnInit {
 
+  userName: string;
+
   constructor(private threadsService: ThreadsService,
               private store: Store<ApplicationState>) {
-    store.subscribe(
-      console.log
-    );
 
+    store
+      .skip(1)
+      .map(this.mapStateToUserName)
+      .subscribe();
+
+
+  }
+
+  mapStateToUserName(state: ApplicationState): string {
+    return state.storeData.participants[state.uiState.userId].name;
   }
 
 
@@ -27,7 +36,7 @@ export class ThreadSectionComponent implements OnInit {
         this.threadsService.loadUserThreads()
           .subscribe(
             allUserData => this.store.dispatch(
-              new LoadUserThreadsAction()
+              new LoadUserThreadsAction(allUserData)
             )
           );
 
