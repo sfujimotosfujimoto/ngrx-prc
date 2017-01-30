@@ -2,7 +2,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
-
 import { AppComponent } from './app.component';
 import { UserSelectionComponent } from './user-selection/user-selection.component';
 import { ThreadSectionComponent } from './thread-section/thread-section.component';
@@ -13,10 +12,12 @@ import {ThreadsService} from './services/threads.service';
 import {Action, StoreModule} from '@ngrx/store';
 import {ApplicationState, INITIAL_APPLICATION_STATE} from './store/application-state';
 import {LOAD_USER_THREADS_ACTION, LoadUserThreadsAction} from './store/actions';
+
 import * as _ from 'lodash';
 
+// Reducer
 function storeReducer(
-  state: ApplicationState = INITIAL_APPLICATION_STATE,
+  state: ApplicationState = INITIAL_APPLICATION_STATE, // default value
   action: Action): ApplicationState {
 
   switch (action.type) {
@@ -27,21 +28,22 @@ function storeReducer(
   }
 }
 
-function handleLoadUserThreadsAction(state: ApplicationState, action: LoadUserThreadsAction): ApplicationState {
-  const userData = action.payload;
+function handleLoadUserThreadsAction(
+  state: ApplicationState,
+  action: LoadUserThreadsAction): ApplicationState {
 
+  const userData = action.payload;
+  // TODO: Where is userData used?
   const newState: ApplicationState = Object.assign({}, state);
 
-
-  newState.storeData = {
-    participants: _.keyBy(action.payload.participants, 'id'),
-    messages: _.keyBy(action.payload.messages, 'id'),
-    threads: _.keyBy(action.payload.threads, 'id')
+  newState.storeData = { // storeData is from app-state.ts
+    participants: _.keyBy(userData.participants, 'id'),
+    messages: _.keyBy(userData.messages, 'id'),
+    threads: _.keyBy(userData.threads, 'id')
   };
+  // console.log('newState: ', newState.storeData);
   return newState;
-
 }
-
 
 @NgModule({
   declarations: [
@@ -56,7 +58,7 @@ function handleLoadUserThreadsAction(state: ApplicationState, action: LoadUserTh
     BrowserModule,
     FormsModule,
     HttpModule,
-    StoreModule.provideStore(storeReducer )
+    StoreModule.provideStore(storeReducer)
   ],
   providers: [ThreadsService],
   bootstrap: [AppComponent]

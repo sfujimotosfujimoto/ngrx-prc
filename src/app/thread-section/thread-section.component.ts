@@ -1,14 +1,14 @@
+///<reference path="../../../node_modules/@types/lodash/index.d.ts"/>
 import {Component, OnInit, state} from '@angular/core';
 import {ThreadsService} from '../services/threads.service';
 import {Store} from '@ngrx/store';
 import {ApplicationState} from '../store/application-state';
 import {LoadUserThreadsAction} from '../store/actions';
 import {Observable} from 'rxjs';
-import {Thread} from '../../../shared/model/thread';
 import {ThreadSummaryVM} from './thread-summary.vm';
-import {mapStateToUserName} from './mapStateToUserName';
+import {userNameSelector} from './userNameSelector';
 import {mapStateToUnreadMessagesCounter} from './mapStateToUnreadMessagesCounter';
-
+import {stateToThreadSummariesSelector} from './stateToThreadSummariesSelector';
 
 @Component({
   selector: 'thread-section',
@@ -24,45 +24,21 @@ export class ThreadSectionComponent implements OnInit {
   constructor(private threadsService: ThreadsService,
               private store: Store<ApplicationState>) {
 
-    this.userName$ = store
-      .skip(1)
-      .map(mapStateToUserName);
+    this.userName$ = store.select(userNameSelector);
 
-    this.unreadMessagesCounter$ = store.skip(1)
-      .map(mapStateToUnreadMessagesCounter);
+    this.unreadMessagesCounter$ = store.map(mapStateToUnreadMessagesCounter);
 
-    this.threadSummaries$ = store.select(
-      state => {
-
-        const threads = _.values<Thread>(state.storeData.threads)
-        return threads.map(thread => {
-          const names = _.keys(thread.participants).map(
-            participantId => state.storeData.participants[participantId].name);
-          const lastMessageId = _.last(thread.messageIds),
-                lastMessage = state.storeData.messages[lastMessageId];
-          return {
-            id: thread.id,
-            participantNames: _.join(names, ','),
-            lastMessageText: lastMessage.text,
-            timestamp: lastMessage.timestamp
-          };
-        });
-
-      }
-    );
-
+    this.threadSummaries$ = store.select(stateToThreadSummariesSelector);
   }
 
 
-
-
-
   ngOnInit() {
-
+    // loads data from backend
         this.threadsService.loadUserThreads()
-          .subscribe(
+          .subscribe( // receives data from '/api/threads'
             allUserData => this.store.dispatch(
-              new LoadUserThreadsAction(allUserData)
+              new LoadUserThreadsAction(allUserData) // to actions.ts
+              // dispatching alluserdata to store
             )
           );
 

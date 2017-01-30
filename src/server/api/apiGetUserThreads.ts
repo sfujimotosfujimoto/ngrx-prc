@@ -1,12 +1,12 @@
 
-import {Application,Request,Response} from 'express';
-import {AllUserData} from "../../../shared/to/all-user-data";
-import {findDbThreadsPerUser} from "../persistence/findDbThreadsPerUser";
+import {Application, Request, Response} from 'express';
+import {AllUserData} from '../../../shared/to/all-user-data';
+import {findDbThreadsPerUser} from '../persistence/findDbThreadsPerUser';
 import * as _ from 'lodash';
-import {dbMessages, dbParticipants} from "../db-data";
-import {Message} from "../../../shared/model/message";
+import {dbMessages, dbParticipants} from '../db-data';
+import {Message} from '../../../shared/model/message';
 
-export function apiGetUserThreads(app:Application) {
+export function apiGetUserThreads(app: Application) {
 
     app.route('/api/threads').get((req: Request, res: Response) => {
 
