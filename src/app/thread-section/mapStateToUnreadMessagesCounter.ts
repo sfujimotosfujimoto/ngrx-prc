@@ -2,6 +2,7 @@
 
 import {ApplicationState} from '../store/application-state';
 import {Thread} from '../../../shared/model/thread';
+import * as _ from 'lodash';
 
 export function mapStateToUnreadMessagesCounter(
     state: ApplicationState
